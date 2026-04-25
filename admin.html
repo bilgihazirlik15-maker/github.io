@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yeşilçam Filmleri | Yönetim</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #151313;
+      --surface: rgba(255,255,255,0.06);
+      --surface-soft: rgba(255,255,255,0.04);
+      --text: #f6f1e8;
+      --muted: #d5cbbb;
+      --line: rgba(255,255,255,0.12);
+      --accent: #c8a46a;
+      --max-width: 1200px;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(200,164,106,0.10), transparent 26%),
+        linear-gradient(180deg, #171313 0%, #110f0f 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .container {
+      width: min(var(--max-width), 92%);
+      margin: 0 auto;
+    }
+
+    .site-header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(17,15,15,0.9);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 0 16px;
+      gap: 14px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      user-select: none;
+    }
+
+    .brand-logo {
+      width: 84px;
+      height: 84px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-family: "Cinzel", serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .main-nav {
+      width: 100%;
+    }
+
+    .main-nav ul {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 42px;
+      flex-wrap: wrap;
+    }
+
+    .main-nav a {
+      font-size: 1rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding-bottom: 4px;
+      border-bottom: 1px solid transparent;
+      transition: 0.2s;
+    }
+
+    .main-nav a:hover,
+    .main-nav a.active {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .page-intro {
+      padding: 42px 0 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.05;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .intro-text {
+      max-width: 720px;
+      color: var(--muted);
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      padding-bottom: 56px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+
+    .panel h2 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .panel-subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      outline: none;
+    }
+
+    .field select option {
+      background: #ffffff;
+      color: #111111;
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .help-text {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: -2px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 18px;
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #1b1611;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.03);
+      color: #1b1611;
+    }
+
+    .message {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+      color: var(--text);
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .movie-list {
+      margin: 0;
+      padding-left: 24px;
+      color: var(--text);
+    }
+
+    .movie-item {
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 16px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      background: var(--surface-soft);
+    }
+
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.86);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .login-box {
+      width: min(360px, 100%);
+      background: #1d1818;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .login-box h2 {
+      font-family: "Cinzel", serif;
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .login-box p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      outline: none;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+
+    .login-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #1b1611;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-weight: 600;
+    }
+
+    .login-box button:hover {
+      filter: brightness(1.03);
+    }
+
+    .error-msg {
+      color: #ff8c8c;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      display: none;
+    }
+
+    @media (max-width: 960px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-inner {
+        padding: 14px 0;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand-name {
+        font-size: 1.55rem;
+        letter-spacing: 0.06em;
+      }
+
+      .brand-logo {
+        width: 50px;
+        height: 50px;
+      }
+
+      .main-nav a {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+
+  <script>
+    (function () {
+      const directSecret = sessionStorage.getItem("secretAdminEntry");
+      const adminAuth = sessionStorage.getItem("adminAuth");
+
+      if (directSecret !== "allowed" && adminAuth !== "true") {
+        window.location.replace("index.html");
+        return;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.body.style.display = "block";
+      });
+    })();
+  </script>
+</head>
+<body style="display:none;">
+  <div id="loginScreen" class="login-screen">
+    <div class="login-box">
+      <h2>Yönetim Girişi</h2>
+      <p>Bu sayfaya erişmek için şifre girin.</p>
+      <input
+        type="password"
+        id="passwordInput"
+        placeholder="Şifre gir"
+        onkeydown="if(event.key==='Enter'){checkPassword();}"
+      />
+      <button type="button" onclick="checkPassword()">Giriş</button>
+      <div id="errorMsg" class="error-msg">Hatalı şifre</div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="header-top">
+        <a href="index.html" class="brand">
+          <img src="logo.png" alt="Yeşilçam Filmleri logosu" class="brand-logo" />
+          <div class="brand-name">Yeşilçam Filmleri</div>
+        </a>
+      </div>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html">Ana Sayfa</a></li>
+          <li><a href="film-arama.html">Film Arama</a></li>
+          <li><a href="ne-izlesem.html">Ne İzlesem?</a></li>
+          <li><a class="active" href="admin.html">Yönetim</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="page-intro">
+      <span class="eyebrow">Yönetim Paneli</span>
+      <h1>Film Ekle</h1>
+      <p class="intro-text">
+        Bu bölümden yeni film ekleyebilir ve kayıtlı filmleri görebilirsin.
+      </p>
+    </section>
+
+    <section class="admin-layout">
+      <div class="panel">
+        <h2>Yeni Film Formu</h2>
+        <p class="panel-subtitle">Aşağıdaki alanları doldurup filmi Google Sheets veritabanına ekleyin.</p>
+
+        <form id="movieForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="title">Film Adı</label>
+              <input type="text" id="title" required />
+            </div>
+
+            <div class="field">
+              <label for="year">Yıl</label>
+              <input type="number" id="year" min="1900" max="2099" required />
+            </div>
+
+            <div class="field">
+              <label for="genre">Tür</label>
+              <select id="genre" required>
+                <option value="">Seçiniz</option>
+                <option>Dram</option>
+                <option>Komedi</option>
+                <option>Romantik</option>
+                <option>Aile</option>
+                <option>Tarih</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="period">Dönem</label>
+              <select id="period" required>
+                <option value="">Seçiniz</option>
+                <option>1950'ler</option>
+                <option>1960'lar</option>
+                <option>1970'ler</option>
+                <option>1980'ler</option>
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="director">Yönetmen</label>
+              <input type="text" id="director" placeholder="Örn: Ertem Eğilmez" required />
+            </div>
+
+            <div class="field full">
+              <label for="actors">Oyuncular</label>
+              <input type="text" id="actors" placeholder="Virgülle ayır: Kemal Sunal, Münir Özkul, Adile Naşit" required />
+            </div>
+
+            <div class="field full">
+              <label for="poster">Poster URL</label>
+              <input type="url" id="poster" placeholder="https://..." required />
+            </div>
+
+            <div class="field full">
+              <label for="youtube">YouTube URL</label>
+              <input type="url" id="youtube" placeholder="https://www.youtube.com/watch?v=..." required />
+              <div class="help-text">Normal YouTube bağlantısı girmen yeterlidir.</div>
+            </div>
+
+            <div class="field full">
+              <label for="description">Açıklama</label>
+              <textarea id="description" placeholder="Film hakkında kısa açıklama..." required></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Filmi Kaydet</button>
+            <button type="reset" class="btn">Formu Temizle</button>
+          </div>
+
+          <div class="message" id="formMessage"></div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Kayıtlı Filmler</h2>
+        <p class="panel-subtitle">Sistemde kayıtlı film adları.</p>
+        <ol id="movieList" class="movie-list"></ol>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAO9iNli2uvZNySvsdMaSRRP9ogdLvLmgz_3AKc6jjl-3tRFNGjgT9y0V0EaXn07Xt/exec";
+    const PASSWORD = "1234";
+
+    const movieForm = document.getElementById("movieForm");
+    const movieList = document.getElementById("movieList");
+    const formMessage = document.getElementById("formMessage");
+    const loginScreen = document.getElementById("loginScreen");
+    const passwordInput = document.getElementById("passwordInput");
+    const errorMsg = document.getElementById("errorMsg");
+
+    function checkPassword() {
+      const input = passwordInput.value;
+
+      if (input === PASSWORD) {
+        loginScreen.style.display = "none";
+        sessionStorage.setItem("adminAuth", "true");
+        sessionStorage.removeItem("secretAdminEntry");
+        errorMsg.style.display = "none";
+      } else {
+        errorMsg.style.display = "block";
+        passwordInput.value = "";
+        passwordInput.focus();
+      }
+    }
+
+    window.addEventListener("load", function () {
+      if (sessionStorage.getItem("adminAuth") === "true") {
+        loginScreen.style.display = "none";
+      } else {
+        loginScreen.style.display = "flex";
+        setTimeout(() => passwordInput.focus(), 100);
+      }
+
+      loadMovies();
+    });
+
+    async function fetchMovies() {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      return data.movies || [];
+    }
+
+    function showMessage(text) {
+      formMessage.textContent = text;
+      formMessage.classList.add("show");
+
+      setTimeout(() => {
+        formMessage.classList.remove("show");
+      }, 3000);
+    }
+
+    function renderMovies(movies) {
+      if (!movies.length) {
+        movieList.innerHTML = `<li class="movie-item">Henüz kayıtlı film yok.</li>`;
+        return;
+      }
+
+      movieList.innerHTML = movies.map((movie) => `
+        <li class="movie-item">${movie.title || "İsimsiz Film"}</li>
+      `).join("");
+    }
+
+    async function loadMovies() {
+      try {
+        const movies = await fetchMovies();
+        renderMovies(movies);
+      } catch (err) {
+        movieList.innerHTML = `<li class="movie-item">Veriler alınamadı. Apps Script bağlantısını kontrol et.</li>`;
+      }
+    }
+
+    movieForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const movie = {
+        title: document.getElementById("title").value.trim(),
+        year: document.getElementById("year").value.trim(),
+        genre: document.getElementById("genre").value,
+        period: document.getElementById("period").value,
+        director: document.getElementById("director").value.trim(),
+        actors: document.getElementById("actors").value.trim(),
+        poster: document.getElementById("poster").value.trim(),
+        youtube: document.getElementById("youtube").value.trim(),
+        description: document.getElementById("description").value.trim()
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(movie)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          movieForm.reset();
+          showMessage("Film başarıyla kaydedildi.");
+          loadMovies();
+        } else {
+          showMessage("Kayıt sırasında hata oluştu.");
+        }
+      } catch (error) {
+        showMessage("Bağlantı hatası oluştu.");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yeşilçam Filmleri | Film Detayı</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #151313;
+      --bg-soft: #1f1a1a;
+      --surface: rgba(255,255,255,0.06);
+      --surface-strong: rgba(255,255,255,0.10);
+      --card: rgba(255,255,255,0.08);
+      --text: #f6f1e8;
+      --muted: #d5cbbb;
+      --line: rgba(255,255,255,0.12);
+      --accent: #c8a46a;
+      --accent-soft: rgba(200,164,106,0.16);
+      --max-width: 1240px;
+      --radius: 18px;
+      --shadow: 0 18px 50px rgba(0,0,0,0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(200,164,106,0.10), transparent 26%),
+        linear-gradient(180deg, #171313 0%, #110f0f 100%);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(var(--max-width), 92%);
+      margin: 0 auto;
+    }
+
+    .site-header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(17, 15, 15, 0.88);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 0 16px;
+      gap: 14px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .brand-logo {
+      width: 84px;
+      height: 84px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.20));
+    }
+
+    .brand-name {
+      font-family: "Cinzel", serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .main-nav {
+      width: 100%;
+    }
+
+    .main-nav ul {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 42px;
+      flex-wrap: wrap;
+    }
+
+    .main-nav a {
+      font-size: 1rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding-bottom: 4px;
+      border-bottom: 1px solid transparent;
+      transition: 0.2s ease;
+    }
+
+    .main-nav a:hover,
+    .main-nav a.active {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 44px 0 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-backdrop {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(14px);
+      transform: scale(1.08);
+      opacity: 0.20;
+      pointer-events: none;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(17,15,15,0.22) 0%, rgba(17,15,15,0.82) 60%, rgba(17,15,15,1) 100%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .loading-box,
+    .empty-box {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 24px;
+      color: var(--muted);
+    }
+
+    .movie-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .poster-shell {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .poster-card {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .poster-image {
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      border-radius: 16px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #282121;
+      overflow: hidden;
+    }
+
+    .poster-caption {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      color: #efe4cf;
+      font-size: 0.93rem;
+      border: 1px solid rgba(200,164,106,0.20);
+    }
+
+    .info-column {
+      display: grid;
+      gap: 14px;
+      align-content: center;
+    }
+
+    .headline-card,
+    .story-card,
+    .facts-card,
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .headline-card {
+      padding: 24px 24px 22px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .movie-title {
+      font-family: "Cinzel", serif;
+      font-size: clamp(1.9rem, 3.8vw, 3.3rem);
+      line-height: 1.08;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .meta-tags span {
+      padding: 8px 14px;
+      border: 1px solid rgba(200,164,106,0.26);
+      background: var(--accent-soft);
+      color: #f0e2ca;
+      border-radius: 999px;
+      font-size: 0.92rem;
+    }
+
+    .lead-text {
+      font-size: 1.02rem;
+      color: var(--muted);
+      margin-bottom: 22px;
+      max-width: 860px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #1d1712;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.10);
+    }
+
+    .facts-card {
+      padding: 20px;
+    }
+
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .fact-box {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 14px 15px;
+      min-height: 84px;
+    }
+
+    .fact-label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .fact-value {
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .story-card {
+      padding: 24px 26px;
+      margin-top: 24px;
+      width: 100%;
+    }
+
+    .card-title {
+      font-family: "Cinzel", serif;
+      font-size: 1.45rem;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .story-text {
+      color: var(--muted);
+      font-size: 1rem;
+      text-align: justify;
+    }
+
+    .actor-link {
+      color: #ead7b5;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .actor-link:hover {
+      border-color: #ead7b5;
+    }
+
+    .content-section {
+      padding: 26px 0 70px;
+    }
+
+    .section-card {
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-family: "Cinzel", serif;
+      font-size: 1.7rem;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .player-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid var(--line);
+    }
+
+    .player-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .section-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .youtube-open-link {
+      display: inline-block;
+      margin-top: 14px;
+      color: #ead7b5;
+      border-bottom: 1px solid transparent;
+    }
+
+    .youtube-open-link:hover {
+      border-color: #ead7b5;
+    }
+
+    .similar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .similar-card {
+      display: block;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .similar-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(200,164,106,0.36);
+    }
+
+    .similar-poster {
+      aspect-ratio: 2 / 3;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #2a2323;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .similar-body {
+      padding: 14px;
+    }
+
+    .similar-title {
+      font-family: "Cinzel", serif;
+      font-size: 1rem;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .similar-meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .similar-empty {
+      color: var(--muted);
+      display: none;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--line);
+      padding: 22px 0 30px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      background: rgba(0,0,0,0.14);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-inner strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    @media (max-width: 1100px) {
+      .similar-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .main-nav ul {
+        gap: 18px;
+      }
+
+      .movie-layout {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .poster-shell {
+        max-width: 340px;
+      }
+
+      .info-column {
+        align-content: start;
+      }
+
+      .facts-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .similar-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand-name {
+        font-size: 1.45rem;
+      }
+
+      .brand-logo {
+        width: 58px;
+        height: 58px;
+      }
+
+      .headline-card,
+      .facts-card,
+      .story-card,
+      .section-card {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .facts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .similar-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .movie-title {
+        font-size: 1.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="header-top">
+        <a href="index.html" class="brand" id="secretBrandLink">
+          <img src="logo.png" alt="Yeşilçam Filmleri logosu" class="brand-logo" />
+          <div class="brand-name">Yeşilçam Filmleri</div>
+        </a>
+      </div>
+
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html">Ana Sayfa</a></li>
+          <li><a href="film-arama.html">Film Arama</a></li>
+          <li><a href="ne-izlesem.html">Ne İzlesem?</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div id="heroBackdrop" class="hero-backdrop"></div>
+      <div class="hero-overlay"></div>
+
+      <div class="container hero-content">
+        <div id="loadingBox" class="loading-box">
+          <h2 class="section-title">Yükleniyor</h2>
+          <p>Film bilgileri hazırlanıyor...</p>
+        </div>
+
+        <div id="movieContent" style="display:none;">
+          <div class="movie-layout">
+            <aside class="poster-shell">
+              <div class="poster-card">
+                <div id="moviePoster" class="poster-image"></div>
+                <div class="poster-caption">
+                  Yeşilçam arşivinden seçilmiş bu film için afiş, temel bilgiler ve izleme bağlantısı aşağıda sunuluyor.
+                </div>
+              </div>
+            </aside>
+
+            <div class="info-column">
+              <section class="headline-card">
+                <span class="eyebrow">Film Detayı</span>
+                <h1 id="movieTitle" class="movie-title">Film Adı</h1>
+                <div id="movieMetaTags" class="meta-tags"></div>
+                <p id="movieLead" class="lead-text"></p>
+
+                <div class="action-row">
+                  <a href="#izle" class="btn btn-primary">Hemen İzle</a>
+                  <a id="youtubeOpenLinkTop" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">YouTube’da Aç</a>
+                </div>
+              </section>
+
+              <section class="facts-card">
+                <h2 class="card-title">Temel Bilgiler</h2>
+                <div class="facts-grid">
+                  <div class="fact-box">
+                    <span class="fact-label">Yönetmen</span>
+                    <div id="movieDirector" class="fact-value"></div>
+                  </div>
+
+                  <div class="fact-box">
+                    <span class="fact-label">Oyuncular</span>
+                    <div id="movieActors" class="fact-value"></div>
+                  </div>
+
+                  <div class="fact-box">
+                    <span class="fact-label">Tür</span>
+                    <div id="movieGenre" class="fact-value"></div>
+                  </div>
+
+                  <div class="fact-box">
+                    <span class="fact-label">Dönem</span>
+                    <div id="moviePeriod" class="fact-value"></div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <section class="story-card">
+            <h2 class="card-title">Film Hakkında</h2>
+            <p id="movieDescription" class="story-text"></p>
+          </section>
+        </div>
+
+        <div id="notFound" class="empty-box" style="display:none;">
+          <h2 class="section-title">Film bulunamadı</h2>
+          <p>İstenen film kaydı bulunamadı.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="izle" class="content-section">
+      <div class="container">
+        <div id="playerSection" class="section-card" style="display:none;">
+          <h2 class="section-title">İzle</h2>
+
+          <div class="player-wrap">
+            <iframe
+              id="moviePlayer"
+              src=""
+              title="YouTube video oynatıcı"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+
+          <p class="section-note">Video oynatılmazsa aşağıdaki bağlantıyla filmi YouTube üzerinde açabilirsin.</p>
+          <a id="youtubeOpenLinkBottom" class="youtube-open-link" href="#" target="_blank" rel="noopener noreferrer">YouTube’da Aç</a>
+        </div>
+
+        <div id="emptyPlayerSection" class="section-card" style="display:none;">
+          <h2 class="section-title">İzle</h2>
+          <p>Bu film için henüz geçerli bir YouTube bağlantısı eklenmemiş.</p>
+          <a id="youtubeOpenLinkFallback" class="youtube-open-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">YouTube’da Aç</a>
+        </div>
+
+        <div id="similarSection" class="section-card" style="display:none;">
+          <h2 class="section-title">Benzer Filmler</h2>
+          <div id="similarGrid" class="similar-grid"></div>
+          <div id="similarEmpty" class="similar-empty">Benzer film bulunamadı.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p><strong>Yeşilçam Filmleri</strong> — Kişisel bir film izleme ve arşivleme projesi.</p>
+      <p>Designed by Daen Yo, 2026</p>
+    </div>
+  </footer>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAO9iNli2uvZNySvsdMaSRRP9ogdLvLmgz_3AKc6jjl-3tRFNGjgT9y0V0EaXn07Xt/exec";
+
+    async function getMovies() {
+      const response = await fetch(SCRIPT_URL);
+      const data = await response.json();
+      return data.movies || [];
+    }
+
+    function getMovieIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return parseInt(params.get("id"), 10);
+    }
+
+    function normalizeText(text) {
+      return String(text || "")
+        .toLocaleLowerCase("tr-TR")
+        .replace(/ç/g, "c")
+        .replace(/ğ/g, "g")
+        .replace(/ı/g, "i")
+        .replace(/ö/g, "o")
+        .replace(/ş/g, "s")
+        .replace(/ü/g, "u")
+        .trim();
+    }
+
+    function convertToEmbed(url) {
+      if (!url || typeof url !== "string") return "";
+
+      try {
+        if (url.includes("youtube.com/embed/")) return url;
+
+        if (url.includes("watch?v=")) {
+          const parsedUrl = new URL(url);
+          const videoId = parsedUrl.searchParams.get("v");
+          return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+        }
+
+        if (url.includes("youtu.be/")) {
+          const parsedUrl = new URL(url);
+          const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
+          const videoId = pathParts[0] || "";
+          return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+        }
+      } catch (error) {
+        return "";
+      }
+
+      return "";
+    }
+
+    function createMetaTags(movie) {
+      const tags = [];
+      if (movie.year) tags.push(String(movie.year));
+      if (movie.genre) tags.push(String(movie.genre));
+      if (movie.period) tags.push(String(movie.period));
+      return tags.map(tag => `<span>${tag}</span>`).join("");
+    }
+
+    function createActorLinks(actorsText) {
+      const actors = String(actorsText || "")
+        .split(",")
+        .map(actor => actor.trim())
+        .filter(Boolean);
+
+      if (!actors.length) return "-";
+
+      return actors.map(actor => {
+        const actorParam = encodeURIComponent(actor);
+        return `<a class="actor-link" href="film-arama.html?actor=${actorParam}">${actor}</a>`;
+      }).join(", ");
+    }
+
+    function getSimilarMovies(currentMovie, allMovies) {
+      const currentId = String(currentMovie.id);
+      const currentGenre = normalizeText(currentMovie.genre);
+      const currentActors = String(currentMovie.actors || "")
+        .split(",")
+        .map(actor => normalizeText(actor))
+        .filter(Boolean);
+
+      return allMovies
+        .filter(movie => String(movie.id) !== currentId)
+        .map(movie => {
+          const movieGenre = normalizeText(movie.genre);
+          const movieActors = String(movie.actors || "")
+            .split(",")
+            .map(actor => normalizeText(actor))
+            .filter(Boolean);
+
+          let score = 0;
+
+          if (movieGenre && movieGenre === currentGenre) score += 3;
+
+          const sharedActors = movieActors.filter(actor => currentActors.includes(actor)).length;
+          score += sharedActors * 2;
+
+          if (normalizeText(movie.period) === normalizeText(currentMovie.period)) score += 1;
+
+          return { movie, score };
+        })
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map(item => item.movie);
+    }
+
+    function renderSimilarMovies(currentMovie, allMovies) {
+      const similarSection = document.getElementById("similarSection");
+      const similarGrid = document.getElementById("similarGrid");
+      const similarEmpty = document.getElementById("similarEmpty");
+
+      const similarMovies = getSimilarMovies(currentMovie, allMovies);
+      similarGrid.innerHTML = "";
+
+      if (!similarMovies.length) {
+        similarSection.style.display = "block";
+        similarEmpty.style.display = "block";
+        return;
+      }
+
+      similarEmpty.style.display = "none";
+      similarSection.style.display = "block";
+
+      similarMovies.forEach(movie => {
+        const card = document.createElement("a");
+        card.className = "similar-card";
+        card.href = `movie.html?id=${movie.id}`;
+
+        const yearText = movie.year ? String(movie.year).trim() : "";
+
+        card.innerHTML = `
+          <div class="similar-poster" style="background-image: url('${movie.poster || ""}');"></div>
+          <div class="similar-body">
+            <div class="similar-title">${movie.title || ""}</div>
+            <div class="similar-meta">${movie.genre || ""}${yearText ? ` • ${yearText}` : ""}</div>
+          </div>
+        `;
+
+        similarGrid.appendChild(card);
+      });
+    }
+
+    function setupPlayer(movie) {
+      const embedUrl = convertToEmbed(movie.youtube || "");
+      const playerSection = document.getElementById("playerSection");
+      const emptyPlayerSection = document.getElementById("emptyPlayerSection");
+      const moviePlayer = document.getElementById("moviePlayer");
+      const youtubeOpenLinkTop = document.getElementById("youtubeOpenLinkTop");
+      const youtubeOpenLinkBottom = document.getElementById("youtubeOpenLinkBottom");
+      const youtubeOpenLinkFallback = document.getElementById("youtubeOpenLinkFallback");
+
+      if (movie.youtube) {
+        youtubeOpenLinkTop.href = movie.youtube;
+        youtubeOpenLinkBottom.href = movie.youtube;
+        youtubeOpenLinkFallback.href = movie.youtube;
+        youtubeOpenLinkFallback.style.display = "inline-block";
+      } else {
+        youtubeOpenLinkTop.href = "#";
+        youtubeOpenLinkBottom.href = "#";
+        youtubeOpenLinkFallback.style.display = "none";
+      }
+
+      if (embedUrl) {
+        moviePlayer.src = embedUrl;
+        playerSection.style.display = "block";
+        emptyPlayerSection.style.display = "none";
+      } else {
+        playerSection.style.display = "none";
+        emptyPlayerSection.style.display = "block";
+      }
+    }
+
+    async function renderMovie() {
+      const loadingBox = document.getElementById("loadingBox");
+      const notFound = document.getElementById("notFound");
+      const movieContent = document.getElementById("movieContent");
+
+      try {
+        const movies = await getMovies();
+        const movieId = getMovieIdFromUrl();
+
+        loadingBox.style.display = "none";
+
+        if (Number.isNaN(movieId)) {
+          notFound.style.display = "block";
+          return;
+        }
+
+        const movie = movies.find(item => String(item.id) === String(movieId));
+
+        if (!movie) {
+          notFound.style.display = "block";
+          return;
+        }
+
+        movieContent.style.display = "block";
+        notFound.style.display = "none";
+
+        document.title = `Yeşilçam Filmleri | ${movie.title || "Film Detayı"}`;
+
+        const title = movie.title || "İsimsiz Film";
+        const description = movie.description || "Bu film için açıklama eklenmemiş.";
+        const poster = movie.poster || "";
+
+        document.getElementById("heroBackdrop").style.backgroundImage = poster ? `url('${poster}')` : "none";
+        document.getElementById("moviePoster").style.backgroundImage = poster ? `url('${poster}')` : "none";
+
+        document.getElementById("movieTitle").textContent = title;
+        document.getElementById("movieLead").textContent = `${title} filmi için temel bilgiler, açıklama ve izleme bağlantısı bu sayfada yer alıyor.`;
+        document.getElementById("movieMetaTags").innerHTML = createMetaTags(movie);
+
+        document.getElementById("movieDescription").textContent = description;
+        document.getElementById("movieDirector").textContent = movie.director || "-";
+        document.getElementById("movieActors").innerHTML = createActorLinks(movie.actors || "");
+        document.getElementById("movieGenre").textContent = movie.genre || "-";
+        document.getElementById("moviePeriod").textContent = movie.period || "-";
+
+        setupPlayer(movie);
+        renderSimilarMovies(movie, movies);
+      } catch (error) {
+        loadingBox.style.display = "none";
+        notFound.style.display = "block";
+      }
+    }
+
+    renderMovie();
+
+    let secretClickCount = 0;
+    let secretClickTimer = null;
+
+    document.getElementById("secretBrandLink").addEventListener("click", function (e) {
+      e.preventDefault();
+
+      secretClickCount++;
+
+      if (secretClickCount === 5) {
+        sessionStorage.setItem("secretAdminEntry", "allowed");
+        window.location.href = "admin.html";
+        return;
+      }
+
+      clearTimeout(secretClickTimer);
+      secretClickTimer = setTimeout(() => {
+        secretClickCount = 0;
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
