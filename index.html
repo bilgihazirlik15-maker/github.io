@@ -361,7 +361,9 @@
           <p>
             Yeşilçam’ın unutulmaz filmlerini sade bir düzen içinde keşfedin. Aşağıda arşivden rastgele seçilmiş filmleri görebilir, afişlerine tıklayarak detay sayfalarına geçebilirsiniz.
           </p>
-          <p id="totalMovieCount">Toplam Film Sayısı: -</p>
+          <p id="totalMovieCount" style="margin-top: 10px;">
+            Toplam Film Sayısı: <span id="filmCountValue">0</span>
+          </p>
         </div>
       </div>
     </section>
@@ -369,18 +371,14 @@
     <section class="section">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Keşfet</h2>
-          <p class="section-note">Arşivden rastgele seçilen 8 film</p>
+          <h2 class="section-title">Son Eklenenler</h2>
+          <p class="section-note">Son eklenen 8 film</p>
         </div>
 
         <div id="discoverGrid" class="discover-grid"></div>
 
         <div id="emptyState" class="empty-state">
           Henüz kayıtlı film bulunmuyor. Önce yönetim panelinden film ekleyin.
-        </div>
-
-        <div class="refresh-wrap">
-          <button id="refreshBtn" class="refresh-btn" type="button">Yeni 8 Film Göster</button>
         </div>
       </div>
     </section>
@@ -398,8 +396,7 @@
 
     const discoverGrid = document.getElementById("discoverGrid");
     const emptyState = document.getElementById("emptyState");
-    const refreshBtn = document.getElementById("refreshBtn");
-    const totalMovieCount = document.getElementById("totalMovieCount");
+    const filmCountValue = document.getElementById("filmCountValue");
 
     let allMovies = [];
 
@@ -409,17 +406,8 @@
       return data.movies || [];
     }
 
-    function shuffleArray(array) {
-      const arr = [...array];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    function getRandomMovies(movies, count = 8) {
-      return shuffleArray(movies).slice(0, count);
+    function getLatestMovies(movies, count = 8) {
+      return [...movies].slice(-count).reverse();
     }
 
     function renderDiscover(movies) {
@@ -427,12 +415,10 @@
 
       if (!movies.length) {
         emptyState.classList.add("show");
-        refreshBtn.style.display = "none";
         return;
       }
 
       emptyState.classList.remove("show");
-      refreshBtn.style.display = "inline-block";
 
       movies.forEach((movie) => {
         const card = document.createElement("a");
@@ -457,24 +443,35 @@
       });
     }
 
+    function animateCount(target) {
+      if (!filmCountValue) return;
+
+      let current = 0;
+      const duration = 800;
+      const stepTime = Math.max(10, Math.floor(duration / Math.max(target, 1)));
+
+      const counter = setInterval(() => {
+        current++;
+        filmCountValue.textContent = current;
+
+        if (current >= target) {
+          clearInterval(counter);
+          filmCountValue.textContent = target;
+        }
+      }, stepTime);
+    }
+
     async function loadDiscover() {
       try {
         allMovies = await getMovies();
-        totalMovieCount.textContent = `Toplam Film Sayısı: ${allMovies.length}`;
-        renderDiscover(getRandomMovies(allMovies, 8));
+        animateCount(allMovies.length);
+        renderDiscover(getLatestMovies(allMovies, 8));
       } catch (error) {
         discoverGrid.innerHTML = "";
-        totalMovieCount.textContent = "Toplam Film Sayısı: -";
         emptyState.classList.add("show");
         emptyState.textContent = "Veriler alınamadı. Apps Script bağlantısını kontrol edin.";
-        refreshBtn.style.display = "none";
       }
     }
-
-    refreshBtn.addEventListener("click", () => {
-      renderDiscover(getRandomMovies(allMovies, 8));
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
 
     loadDiscover();
 
