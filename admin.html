@@ -810,15 +810,29 @@
       }, 3000);
     }
 
+    function renderMovieListMessage(message) {
+      movieList.replaceChildren();
+
+      const item = document.createElement("li");
+      item.className = "movie-item";
+      item.textContent = message;
+      movieList.appendChild(item);
+    }
+
     function renderMovies(movies) {
+      movieList.replaceChildren();
+
       if (!movies.length) {
-        movieList.innerHTML = `<li class="movie-item">Henüz kayıtlı film yok.</li>`;
+        renderMovieListMessage("Henüz kayıtlı film yok.");
         return;
       }
 
-      movieList.innerHTML = movies.map((movie) => `
-        <li class="movie-item">${movie.title || "İsimsiz Film"}</li>
-      `).join("");
+      movies.forEach((movie) => {
+        const item = document.createElement("li");
+        item.className = "movie-item";
+        item.textContent = movie.title || "İsimsiz Film";
+        movieList.appendChild(item);
+      });
     }
 
     async function loadMovies() {
@@ -826,7 +840,7 @@
         const movies = await fetchMovies();
         renderMovies(movies);
       } catch (err) {
-        movieList.innerHTML = `<li class="movie-item">Veriler alınamadı. Apps Script bağlantısını kontrol et.</li>`;
+        renderMovieListMessage("Veriler alınamadı. Apps Script bağlantısını kontrol et.");
       }
     }
 
