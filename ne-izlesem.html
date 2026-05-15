@@ -589,6 +589,40 @@
     }
 
     tryPoster(posterUrls[activeIndex]);
+    const posterUrls = Array.isArray(urls) ? urls.filter(Boolean) : [urls].filter(Boolean);
+    let activeIndex = 0;
+
+    function applyPoster(url) {
+      posterBox.style.backgroundImage = `url("${url}")`;
+      posterPlaceholder.style.display = "none";
+      posterImg.style.display = "none";
+      posterImg.alt = `${title || "Film"} afişi`;
+      posterImg.src = url;
+    }
+
+    posterImg.onload = function () {
+      posterImg.style.display = "block";
+      posterPlaceholder.style.display = "none";
+    };
+
+    posterImg.onerror = function () {
+      activeIndex++;
+
+      if (activeIndex < posterUrls.length) {
+        applyPoster(posterUrls[activeIndex]);
+        return;
+      }
+
+      posterImg.removeAttribute("src");
+      posterImg.style.display = "none";
+      posterPlaceholder.style.display = "none";
+    };
+
+    applyPoster(posterUrls[activeIndex]);
+
+    if (posterImg.complete && posterImg.naturalWidth > 0) {
+      posterImg.onload();
+    }
   }
 
   function applyFilm(f) {
