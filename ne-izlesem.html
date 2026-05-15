@@ -459,6 +459,18 @@
     }
   }
 
+  function isYouTubeUrl(value) {
+    const safeUrl = getSafeUrl(value);
+    if (!safeUrl) return false;
+
+    try {
+      const hostname = new URL(safeUrl).hostname.replace(/^www\./, "");
+      return ["youtube.com", "m.youtube.com", "youtu.be", "youtube-nocookie.com"].includes(hostname);
+    } catch (error) {
+      return false;
+    }
+  }
+
   function getPosterUrls(film) {
     const movie = film || {};
     const posterFields = [
@@ -466,8 +478,11 @@
       "posterUrl",
       "posterURL",
       "poster_url",
+      "posterLink",
+      "poster_link",
       "Poster",
       "Poster URL",
+      "Poster Link",
       "image",
       "imageUrl",
       "imageURL",
@@ -479,16 +494,23 @@
       "afiş",
       "afisUrl",
       "afişUrl",
+      "afisLink",
+      "afişLink",
       "Afiş",
       "Afiş URL",
       "Afis URL",
+      "Afiş Linki",
+      "Afis Linki",
       "gorsel",
       "görsel",
       "Görsel",
       "Görsel URL",
       "resim",
+      "resimUrl",
+      "resimLink",
       "Resim",
-      "Resim URL"
+      "Resim URL",
+      "Resim Linki"
     ];
 
     for (const field of posterFields) {
@@ -499,6 +521,13 @@
     const posterKeyPattern = /(poster|image|img|afis|afiş|gorsel|görsel|resim)/i;
     for (const [key, value] of Object.entries(movie)) {
       if (!posterKeyPattern.test(key)) continue;
+
+      const posterUrls = getPosterUrlCandidatesFromValue(value);
+      if (posterUrls.length) return posterUrls;
+    }
+
+    for (const [key, value] of Object.entries(movie)) {
+      if (isYouTubeUrl(value) || /youtube/i.test(key)) continue;
 
       const posterUrls = getPosterUrlCandidatesFromValue(value);
       if (posterUrls.length) return posterUrls;
