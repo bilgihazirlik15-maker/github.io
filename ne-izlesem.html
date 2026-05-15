@@ -156,6 +156,9 @@
       overflow: hidden;
       border: 1px solid var(--line);
       background: rgba(255,255,255,0.04);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -379,11 +382,27 @@
     return films[Math.floor(Math.random() * films.length)];
   }
 
+  function extractUrl(value) {
+    const text = String(value || "").trim();
+    if (!text) return "";
+
+    const quotedUrlMatch = text.match(/["'](https?:\/\/[^"']+|www\.[^"']+)["']/i);
+    if (quotedUrlMatch) return quotedUrlMatch[1];
+
+    const plainUrlMatch = text.match(/https?:\/\/[^\s,)]+|www\.[^\s,)]+/i);
+    return plainUrlMatch ? plainUrlMatch[0] : text;
+  }
+
   function getSafeUrl(value) {
-    if (!value) return "";
+    const extractedUrl = extractUrl(value);
+    if (!extractedUrl) return "";
+
+    const normalizedUrl = extractedUrl.startsWith("www.")
+      ? `https://${extractedUrl}`
+      : extractedUrl;
 
     try {
-      const url = new URL(String(value).trim(), window.location.href);
+      const url = new URL(normalizedUrl, window.location.href);
       return ["http:", "https:"].includes(url.protocol) ? url.href : "";
     } catch (error) {
       return "";
@@ -417,14 +436,30 @@
       "poster",
       "posterUrl",
       "posterURL",
+      "poster_url",
+      "Poster",
+      "Poster URL",
       "image",
       "imageUrl",
       "imageURL",
+      "image_url",
+      "Image",
+      "Image URL",
       "img",
       "afis",
       "afiş",
       "afisUrl",
-      "afişUrl"
+      "afişUrl",
+      "Afiş",
+      "Afiş URL",
+      "Afis URL",
+      "gorsel",
+      "görsel",
+      "Görsel",
+      "Görsel URL",
+      "resim",
+      "Resim",
+      "Resim URL"
     ];
 
     for (const field of posterFields) {
@@ -432,24 +467,35 @@
       if (posterUrl) return posterUrl;
     }
 
+    const posterKeyPattern = /(poster|image|img|afis|afiş|gorsel|görsel|resim)/i;
+    for (const [key, value] of Object.entries(movie)) {
+      if (!posterKeyPattern.test(key)) continue;
+
+      const posterUrl = normalizePosterUrl(value);
+      if (posterUrl) return posterUrl;
+    }
+
     return "";
   }
 
   function showPosterPlaceholder() {
+    const posterBox = document.getElementById("posterBox");
     const posterImg = document.getElementById("posterImg");
     const posterPlaceholder = document.getElementById("posterPlaceholder");
 
+    posterBox.style.backgroundImage = "none";
     posterImg.removeAttribute("src");
     posterImg.style.display = "none";
     posterPlaceholder.style.display = "block";
   }
 
   function showPosterImage(url, title) {
+    const posterBox = document.getElementById("posterBox");
     const posterImg = document.getElementById("posterImg");
     const posterPlaceholder = document.getElementById("posterPlaceholder");
 
-    posterImg.style.display = "none";
-    posterPlaceholder.style.display = "block";
+    posterBox.style.backgroundImage = `url("${url}")`;
+    posterPlaceholder.style.display = "none";
 
     posterImg.onload = function () {
       posterImg.style.display = "block";
@@ -459,6 +505,10 @@
     posterImg.onerror = showPosterPlaceholder;
     posterImg.alt = `${title || "Film"} afişi`;
     posterImg.src = url;
+
+    if (posterImg.complete && posterImg.naturalWidth > 0) {
+      posterImg.onload();
+    }
   }
 
   function applyFilm(f) {
